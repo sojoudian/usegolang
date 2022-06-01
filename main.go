@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func handlerFunc(w http.ResponseWriter, r *http.Request) {
+func homehandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	fmt.Fprintf(w, "<h1>Index</h1>")
 }
@@ -29,17 +29,18 @@ func maz(w http.ResponseWriter, r *http.Request) {
 //		//w.WriteHeader(http.StatusNotFound)
 //		//fmt.Fprintf(w, "Page not found")
 //	}
-//	//fmt.Fprintln(w, r.URL.RawPath)
-//	//fmt.Fprintln(w, r.URL.Path)
+//	  fmt.Fprintln(w, r.URL.RawPath)
+//	  fmt.Fprintln(w, r.URL.Path)
 //}
 //
 
-type Router struct{}
+type Router struct {
+}
 
-func (router Router) serveHTTP(w http.ResponseWriter, r *http.Request) {
+func (router Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.URL.Path {
 	case "/":
-		handlerFunc(w, r)
+		homehandler(w, r)
 	case "/maz":
 		maz(w, r)
 	default:
