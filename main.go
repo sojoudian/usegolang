@@ -35,7 +35,9 @@ func pathHandler(w http.ResponseWriter, r *http.Request) {
 //type Router struct {
 //}
 //
-//func (router Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+//func (router Router) Serve
+//
+//HTTP(w http.ResponseWriter, r *http.Request) {
 //	switch r.URL.Path {
 //	case "/":
 //		homehandler(w, r)
