@@ -48,12 +48,12 @@ func pathHandler(w http.ResponseWriter, r *http.Request) {
 //	}
 //}
 
-func main() {
-	var router http.HandlerFunc
-	router = pathHandler
-	fmt.Println("Starting the server on :3000...")
-	http.ListenAndServe(":3000", router)
-}
+//func main() {
+//	var router http.HandlerFunc
+//	router = pathHandler
+//	fmt.Println("Starting the server on :3000...")
+//	http.ListenAndServe(":3000", router)
+//}
 
 //func main() {
 //	var router Router
@@ -63,3 +63,22 @@ func main() {
 //	http.ListenAndServe(":3000", router)
 //
 //}
+
+type Server struct {
+	DB string
+}
+
+func (s *Server) AboutHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func main() {
+	var s Server
+	http.HandleFunc("/about", s.AboutHandler)
+	http.HandleFunc("/", http.HandlerFunc(homehandler).ServeHTTP)
+	//http.HandleFunc("/maz", http.HandlerFunc(maz).ServeHTTP)
+	http.Handle("/maz", http.HandlerFunc(maz))
+	fmt.Println("starting the server on :3000")
+	http.ListenAndServe(":3000", nil)
+
+}
