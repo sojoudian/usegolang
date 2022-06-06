@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/go-chi/chi/v5"
 	"net/http"
 )
 
@@ -24,71 +25,47 @@ func faq(w http.ResponseWriter, r *http.Request) {
 `)
 }
 
-//func pathHandler(w http.ResponseWriter, r *http.Request) {
-//	//w.Header().Set("Content-Type", "text/html; charset=utf-8")
+// HTTP handler accessing the url routing parameters.
+func MyRequestHandler(w http.ResponseWriter, r *http.Request) {
+	// fetch the url parameter `"userID"` from the request of a matching
+	// routing pattern. An example routing pattern could be: /users/{userID}
+	userID := chi.URLParam(r, "userID")
+
+	// fetch `"key"` from the request context
+	ctx := r.Context()
+	key := ctx.Value("key").(string)
+
+	// respond to the client
+	w.Write([]byte(fmt.Sprintf("hi %v, %v", userID, key)))
+}
+
+func main() {
+	r := chi.NewRouter()
+	r.Get("/", homehandler)
+	r.Get("/faq", faq)
+	r.Get("/maz", maz)
+	r.Get("/users/{userID}", MyRequestHandler)
+	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "Page not found!!!!", http.StatusNotFound)
+	})
+	fmt.Println("starting the server on :3000")
+	http.ListenAndServe(":3000", r)
+
+}
+
+//
+//type Router struct {
+//}
+//
+//func (router Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 //	switch r.URL.Path {
 //	case "/":
 //		homehandler(w, r)
 //	case "/maz":
 //		maz(w, r)
+//	case "/faq":
+//		faq(w, r)
 //	default:
 //		http.Error(w, "Page note found", http.StatusNotFound)
-//		// this is equal to below two lines of code
-//		//w.WriteHeader(http.StatusNotFound)
-//		//fmt.Fprintf(w, "Page not found")
 //	}
-//	fmt.Fprintln(w, r.URL.RawPath)
-//	fmt.Fprintln(w, r.URL.Path)
 //}
-
-type Router struct {
-}
-
-func (router Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	switch r.URL.Path {
-	case "/":
-		homehandler(w, r)
-	case "/maz":
-		maz(w, r)
-	case "/faq":
-		faq(w, r)
-	default:
-		http.Error(w, "Page note found", http.StatusNotFound)
-	}
-}
-
-//func main() {
-//	var router http.HandlerFunc
-//	router = pathHandler
-//	fmt.Println("Starting the server on :3000...")
-//	http.ListenAndServe(":3000", router)
-//}
-
-//func main() {
-//	var router Router
-//	//http.HandleFunc("/maz", pathHandler)
-//	//http.HandleFunc("/", pathHandler)
-//	fmt.Println("starting the server on :3000")
-//	http.ListenAndServe(":3000", router)
-//
-//}
-
-//type Server struct {
-//	DB string
-//}
-//
-//func (s *Server) AboutHandler(w http.ResponseWriter, r *http.Request) {
-//
-//}
-
-func main() {
-	//var s Server
-	//http.HandleFunc("/about", s.AboutHandler)
-	//http.HandleFunc("/", http.HandlerFunc(homehandler).ServeHTTP)
-	//http.HandleFunc("/maz", http.HandlerFunc(maz).ServeHTTP)
-	//http.Handle("/maz", http.HandlerFunc(maz))
-	var router Router
-	fmt.Println("starting the server on :3000")
-	http.ListenAndServe(":3000", router)
-
-}
