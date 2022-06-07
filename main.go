@@ -7,8 +7,9 @@ import (
 )
 
 func homehandler(w http.ResponseWriter, r *http.Request) {
+	bio := `<script>alert("You were hacked")</script>`
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprintf(w, "<h1>Index</h1>")
+	fmt.Fprintf(w, "<h1>Index</h1><p>Bio:"+bio+"</p>")
 }
 
 func maz(w http.ResponseWriter, r *http.Request) {
