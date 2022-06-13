@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
+	"github.com/sojoudian/usegolang/views"
 	"html/template"
 	"log"
 	"net/http"
@@ -18,20 +19,13 @@ type User struct {
 }
 
 func executeTemplate(w http.ResponseWriter, filePath string) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-
-	tpl, err := template.ParseFiles(filePath)
+	t, err := views.Parsefile(filePath)
 	if err != nil {
 		log.Printf("parsing template %v", err)
 		http.Error(w, "There was an error parsing the template.", http.StatusInternalServerError)
 		return
 	}
-	err = tpl.Execute(w, nil) // change nil to user data
-	if err != nil {
-		log.Printf("parsing template %v", err)
-		http.Error(w, "There was an error parsing the template.", http.StatusInternalServerError)
-		return
-	}
+	t.Execute(w, nil)
 }
 func homehandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -67,13 +61,45 @@ func help(w http.ResponseWriter, r *http.Request) {
 	executeTemplate(w, tpl)
 }
 
-func faq(w http.ResponseWriter, r *http.Request) {
+func s4e(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprintf(w, `<h1>Faq page</h1>
-<ul>
-	<li>first</li>
-</ul>
-`)
+	type Fav struct {
+		Movie string
+		Music string
+		Pi    float64
+	}
+	type S4E struct {
+		Name   string
+		Bio    string
+		Age    int
+		Allfav Fav
+	}
+	userInfo := S4E{
+		Name: "Maz",
+		Bio:  "this is the bio",
+		Age:  32,
+		Allfav: Fav{
+			Movie: "Batman",
+			//Music: "Metallica",
+			Pi: 3.14,
+		},
+	}
+	tpl, err := template.ParseFiles("templates/s4e.gohtml")
+	if err != nil {
+		log.Printf("parsing template %v", err)
+		http.Error(w, "There was an error parsing the template.", http.StatusInternalServerError)
+		return
+	}
+	err = tpl.Execute(w, userInfo)
+	if err != nil {
+		log.Printf("parsing template %v", err)
+		http.Error(w, "There was an error parsing the template.", http.StatusInternalServerError)
+		return
+	}
+}
+
+func faq(w http.ResponseWriter, r *http.Request) {
+	executeTemplate(w, filepath.Join("templates", "faq.gohtml"))
 }
 
 func main() {
@@ -81,6 +107,7 @@ func main() {
 	r.Get("/", homehandler)
 	r.Get("/faq", faq)
 	r.Get("/help", help)
+	r.Get("/s4e", s4e)
 	fileServer := http.FileServer(http.Dir("./static/"))
 	r.Handle("/static/*", http.StripPrefix("/static", fileServer))
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {

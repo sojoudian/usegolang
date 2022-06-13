@@ -1,0 +1,24 @@
+<h1>Hello, {{.Name}}</h1>
+<p>Bio: {{.Bio}}</p>
+
+{{if .Allfav.Movie}}
+<p> Movie: {{.Allfav.Movie}}</p>
+{{end}}
+
+{{if .Allfav.Music}}
+<p> Music: {{.Allfav.Music}}</p>
+{{end}}
+
+
+<script>
+    const user = {
+        "name": {{.Name}},
+        "bio": {{.Bio}},
+        "age": {{.Age}},
+        "AllFav": {
+            Movie: {{.Allfav.Movie}},
+            Music: {{.Allfav.Music}},
+        }
+    };
+    console.log(user)
+</script>
