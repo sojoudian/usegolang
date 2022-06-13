@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 )
 
 type User struct {
@@ -16,6 +17,22 @@ type User struct {
 	Vote     string
 }
 
+func executeTemplate(w http.ResponseWriter, filePath string) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	tpl, err := template.ParseFiles(filePath)
+	if err != nil {
+		log.Printf("parsing template %v", err)
+		http.Error(w, "There was an error parsing the template.", http.StatusInternalServerError)
+		return
+	}
+	err = tpl.Execute(w, nil) // change nil to user data
+	if err != nil {
+		log.Printf("parsing template %v", err)
+		http.Error(w, "There was an error parsing the template.", http.StatusInternalServerError)
+		return
+	}
+}
 func homehandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	hostname, err := os.Hostname()
@@ -45,9 +62,9 @@ func homehandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func maz(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprintf(w, "<h1>Hello from Maz</h1>")
+func help(w http.ResponseWriter, r *http.Request) {
+	tpl := filepath.Join("templates", "help.gohtml")
+	executeTemplate(w, tpl)
 }
 
 func faq(w http.ResponseWriter, r *http.Request) {
@@ -63,7 +80,7 @@ func main() {
 	r := chi.NewRouter()
 	r.Get("/", homehandler)
 	r.Get("/faq", faq)
-	r.Get("/maz", maz)
+	r.Get("/help", help)
 	fileServer := http.FileServer(http.Dir("./static/"))
 	r.Handle("/static/*", http.StripPrefix("/static", fileServer))
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
