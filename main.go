@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
+	"github.com/sojoudian/usegolang/controllers"
 	"github.com/sojoudian/usegolang/views"
 	"html/template"
 	"log"
@@ -17,6 +18,10 @@ type User struct {
 	Option_b string
 	Vote     string
 }
+
+var (
+	HomeTemplate views.Template
+)
 
 func executeTemplate(w http.ResponseWriter, filePath string) {
 	t, err := views.Parsefile(filePath)
@@ -104,10 +109,30 @@ func faq(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	r := chi.NewRouter()
-	r.Get("/", homehandler)
+
+	tpl, err := views.Parsefile(filepath.Join("templates", "index.gohtml"))
+	if err != nil {
+		panic(err)
+	}
+	r.Get("/home", controllers.StatickHandler(tpl))
+
+	r.Get("/", homehandler) // duplicate but I need it for the future use
 	r.Get("/faq", faq)
-	r.Get("/help", help)
-	r.Get("/s4e", s4e)
+
+	tpl, err = views.Parsefile(filepath.Join("templates", "help.gohtml"))
+	if err != nil {
+		panic(err)
+	}
+	r.Get("/help", controllers.StatickHandler(tpl))
+	//r.Get("/help", help)
+
+	tpl, err = views.Parsefile(filepath.Join("templates", "s4e.gohtml"))
+	if err != nil {
+		panic(err)
+	}
+	r.Get("/faq", controllers.StatickHandler(tpl))
+	//r.Get("/s4e", s4e)
+
 	fileServer := http.FileServer(http.Dir("./static/"))
 	r.Handle("/static/*", http.StripPrefix("/static", fileServer))
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
