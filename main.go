@@ -110,26 +110,17 @@ func faq(w http.ResponseWriter, r *http.Request) {
 func main() {
 	r := chi.NewRouter()
 
-	tpl, err := views.Parsefile(filepath.Join("templates", "index.gohtml"))
-	if err != nil {
-		panic(err)
-	}
+	tpl := views.Must(views.Parsefile(filepath.Join("templates", "index.gohtml")))
 	r.Get("/home", controllers.StatickHandler(tpl))
 
 	r.Get("/", homehandler) // duplicate but I need it for the future use
 	r.Get("/faq", faq)
 
-	tpl, err = views.Parsefile(filepath.Join("templates", "help.gohtml"))
-	if err != nil {
-		panic(err)
-	}
-	r.Get("/help", controllers.StatickHandler(tpl))
+	//tpl = views.Must(views.Parsefile(filepath.Join("templates", "help.gohtml")))
+	r.Get("/help", controllers.StatickHandler(views.Must(views.Parsefile(filepath.Join("templates", "help.gohtml")))))
 	//r.Get("/help", help)
 
-	tpl, err = views.Parsefile(filepath.Join("templates", "s4e.gohtml"))
-	if err != nil {
-		panic(err)
-	}
+	tpl = views.Must(views.Parsefile(filepath.Join("templates", "s4e.gohtml")))
 	r.Get("/faq", controllers.StatickHandler(tpl))
 	//r.Get("/s4e", s4e)
 
